@@ -13,5 +13,5 @@ along with other calculation methods ignored in the built-in one such as Egypt, 
 * these sensors will be updated to new values at each midnight
 
 ## Credits
-* Orignal Maintainer of the built-in component[engrbm87](https://github.com/engrbm87)
-* Modifier by [modestpharaoh](https://github.com/modestpharaoh)
+* Orignal Maintainer of the built-in component: [engrbm87](https://github.com/engrbm87)
+* Modified by [modestpharaoh](https://github.com/modestpharaoh)
