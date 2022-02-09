@@ -103,5 +103,4 @@ tts_remote_speaker.update_attributes:
 ```
 
 ## Credits
-* Orignal Maintainer of the built-in component: [engrbm87](https://github.com/engrbm87)
-* Modified by [modestpharaoh](https://github.com/modestpharaoh)
+* Developed by [modestpharaoh](https://github.com/modestpharaoh)
