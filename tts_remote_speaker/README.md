@@ -46,7 +46,7 @@ tts_remote_speaker.play_audio:
     fields:
         entity_id:
             description: Speaker Entity ID.
-            example: 'media_player.tts_remote_speaker'
+            example: 'media_player.hass_local_speaker'
         media_id:
             description: Audio URL/Path/source for the audio file.
             example: 'alarm'
@@ -75,7 +75,7 @@ An example automation should run Azan audio with higher priority (ex.priority 35
 ```
 data:
   announcement_music: false  # You don't want annmoncement music before Azan
-  entity_id: media_player.tts_remote_speaker
+  entity_id: media_player.hass_local_speaker
   media_id:  الأذان
   priority: 35
   repeat_num: 0  # You don't want to repeat Azan
@@ -95,7 +95,7 @@ tts_remote_speaker.update_attributes:
     fields:
         entity_id:
             description: Speaker Entity ID.
-            example: 'media_player.tts_remote_speaker'
+            example: 'media_player.hass_local_speaker'
         volume:
             description: Volume level
             example: '0.2'
