@@ -1,0 +1,39 @@
+# Describes the format for available tts_remote_speaker services
+
+play_audio:
+    description: play audio
+    fields:
+        entity_id:
+            description: Speaker Entity ID.
+            example: 'media_player.tts_remote_speaker'
+        media_id:
+            description: Audio URL file or save audio file.
+            example: 'alarm'
+        volume:
+            description: Volume level
+            example: '0.2'
+        announcement_music:
+            description: To play the default announcement music or not.
+            example: true
+        repeat_num:
+            description: Repeat playing of the audio file to that number.
+            example: 2
+        priority:
+            description: Prioriy of the Media to play.
+            example: 30
+
+update_attributes:
+    description: update media player special attributes and volume level (They will always override, if homeassistant restart)
+    fields:
+        entity_id:
+            description: Speaker Entity ID.
+            example: 'media_player.tts_remote_speaker'
+        volume:
+            description: Volume level
+            example: '0.2'
+        announcement_music:
+            description: To play the default announcement music or not.
+            example: true
+        repeat_num:
+            description: Repeat playing of the audio file to that number.
+            example: 2
