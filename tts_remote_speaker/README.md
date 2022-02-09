@@ -16,6 +16,8 @@ tts_remote_speaker directory into the custom_components directory of home assist
       repeat_num_for_tts: 1
       announcement_music: false
   ```
+  **WARNING: Configured announcement_music and repeat_num parameters are inherited for all media_player.play_media. If announcement_music is true and repeat_num_for_tts is 2, this will run the default announcement music before the media to play, then play the requested media for 3 times.**
+
 * Reboot your home assistant, you should have media player entity: media_player.hass_local_speaker
 
 ## Supported Home Aassistant media player features:
@@ -71,7 +73,7 @@ tts_remote_speaker.play_audio:
 #### Tips
 An example automation should run Azan audio with higher priority (ex.priority 35) than other audio you run manually (ex. priority 0).
 ```
-data_template:
+data:
   announcement_music: false  # You don't want annmoncement music before Azan
   entity_id: media_player.tts_remote_speaker
   media_id:  الأذان
@@ -84,6 +86,9 @@ service: tts_remote_speaker.play_audio
 
 ### update_attributes
 update media player special attributes and volume level (They will always override, if homeassistant restart)
+
+This is useful to set a custom announcement_music, repeat_num and volume parameters for the remote speaker media player entity, before call media_player.play_media service or tts.google_say with media player entity as the remote entity.
+
 ```
 tts_remote_speaker.update_attributes:
     description: update media player special attributes and volume level (They will always override, if homeassistant restart)
@@ -100,6 +105,23 @@ tts_remote_speaker.update_attributes:
         repeat_num:
             description: Repeat playing of the audio file to that number.
             example: 2
+```
+#### Example:
+Automation to run announcement music, then  run Google TTS announcement 3 times, with volume set to 80%.
+
+```
+  - service: tts_remote_speaker.update_attributes
+    data:
+      announcement_music: true
+      entity_id: media_player.hass_local_speaker
+      repeat_num: 2
+      volume: 0.8
+  - service: tts.google_say
+    data:
+      entity_id: media_player.hass_local_speaker
+      language: 'en'
+      message: 'Hello World!'
+    
 ```
 
 ## Credits
