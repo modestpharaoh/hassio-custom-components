@@ -1,7 +1,7 @@
 # Describes the format for available tts_remote_speaker services
 
 play_audio:
-    description: play audio
+    description: play audio with the extra parameters (announcement_music, priority, repeat_num, volume)
     fields:
         entity_id:
             description: Speaker Entity ID.
