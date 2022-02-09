@@ -40,6 +40,8 @@ tts_remote_speaker directory into the custom_components directory of home assist
 ### play_audio
 It allow you to play audio with the extra parameters (announcement_music, priority, repeat_num, volume)
 
+NOTED: Setting the priority is only available through this service, otherwise media_player.play_audio runs with priority 0.
+
 ```
 tts_remote_speaker.play_audio:
     description: play audio with the extra parameters (announcement_music, priority, repeat_num, volume)
@@ -70,8 +72,8 @@ tts_remote_speaker.play_audio:
 * You can run any media /media/dwsdsad/xcxcx.mp3, it will play the local media file, as this supposed to be shared to the remote speaker addos
 * Play any of the predefined  audio sources by just write the source name
 
-#### Tips
-An example automation should run Azan audio with higher priority (ex.priority 35) than other audio you run manually (ex. priority 0).
+#### Example
+Automation should run Azan audio with higher priority (ex.priority 35) than other audio you run manually (ex. priority 0).
 ```
 data:
   announcement_music: false  # You don't want annmoncement music before Azan
