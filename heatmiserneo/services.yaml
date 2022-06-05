@@ -1,0 +1,54 @@
+# Describes the format for available heatmiserneo services
+
+activate_frost:
+    description: Activate standby mode on heatmiser thermostat.
+    fields:
+        entity_id:
+            description: Thermostat Entity ID.
+            example: 'climate.kitchen'
+
+cancel_frost:
+    description: Cancel standby mode on heatmiser thermostat.
+    fields:
+        entity_id:
+            description: Thermostat Entity ID.
+            example: 'climate.kitchen'
+
+cancel_hold:
+    description: Cancel hold temperature on heatmiser thermostat and return to original set temperature.
+    fields:
+        entity_id:
+            description: Thermostat Entity ID.
+            example: 'climate.kitchen'
+
+
+hold_temperature:
+    description: Activate hold temperature on heatmiser thermostat for certain time and temperature
+    fields:
+        entity_id:
+            description: Thermostat Entity ID.
+            example: 'climate.kitchen'
+        hold_temperature:
+            description: The required hold temperature.
+            example: '16'
+        hold_hours:
+            description: Number of hours to hold temperature for.
+            example: '3'
+        hold_minutes:
+            description: Number of minutes to hold temperature for.
+            example: '30'
+
+
+neo_update:
+    description: Force query the update from heatmiser hub.
+
+
+set_frost_temperature:
+    description: Only set the frost temoerature, without activating it .
+    fields:
+        entity_id:
+            description: Thermostat Entity ID.
+            example: 'climate.kitchen'
+        frost_temperature:
+            description: The required frost temperature.
+            example: '16'
