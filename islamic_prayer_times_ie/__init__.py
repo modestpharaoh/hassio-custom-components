@@ -96,7 +96,7 @@ class IslamicPrayerClient:
     def get_new_prayer_times(self):
         """Fetch prayer times for today."""
         calc_method = self.calc_method
-        _LOGGER.info(calc_method)
+        _LOGGER.debug(calc_method)
         
         # For standard calculation methods, we use fetch_prayer_times library
         # resp is Dict, sample: {'Fajr': '06:47', 'Sunrise': '08:37', 'Dhuhr': '12:22', 'Asr': '13:53', 'Sunset': '16:07', 'Maghrib': '16:07', 'Isha': '17:57', 'Imsak': '06:37', 'Midnight': '00:22'}
@@ -134,9 +134,9 @@ class IslamicPrayerClient:
             try:
                 resp = requests.get(url=url, params = {})
                 if resp.status_code != requests.codes.ok:
-                    _LOGGER.info('islamireland request failed')
+                    _LOGGER.debug('islamireland request failed')
                 else:
-                    _LOGGER.info('islamireland was successful')
+                    _LOGGER.debug('islamireland was successful')
                 json_resp = resp.json()
             except Exception as e:
                 _LOGGER.info('islamireland request exception raised, got error:' + str(e))
@@ -152,7 +152,7 @@ class IslamicPrayerClient:
                     'Isha': formatTime(prayers[5]),
                     'Imsak': formatTime(prayers[4]), 
                     'Midnight': midnight}
-                    _LOGGER.info(prayer_times_info)
+                    _LOGGER.debug(prayer_times_info)
                     return prayer_times_info
                 except Exception as e:
                     _LOGGER.info('Failed to retrive prayer from ICCI, failed to parse prayers from JSON:' + str(e))
@@ -219,7 +219,7 @@ class IslamicPrayerClient:
             prayer_times = await self.hass.async_add_executor_job(
                 self.get_new_prayer_times
             )
-            _LOGGER.info(prayer_times)
+            _LOGGER.debug(prayer_times)
             self.available = True
         except (exceptions.InvalidResponseError, ConnError):
             self.available = False
