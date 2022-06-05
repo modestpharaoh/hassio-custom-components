@@ -233,7 +233,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 async def async_handle_hold_temperature_service(hass, call):
     """Handle hold temp service calls."""
     entity_id = call.data[ATTR_ENTITY_ID]
-    hold_temperature = int(float(call.data["hold_temperature"]))
+    hold_temperature = float(call.data["hold_temperature"])
     hold_hours = int(float(call.data["hold_hours"]))
     hold_minutes = int(float(call.data["hold_minutes"]))
     thermostat = get_entity_from_domain(hass, DOMAIN, entity_id)
@@ -268,7 +268,7 @@ async def async_handle_cancel_hold_service(hass, call):
     """Handle cancel hold service calls."""
     entity_id = call.data[ATTR_ENTITY_ID]
     thermostat = get_entity_from_domain(hass, DOMAIN, entity_id)
-    hold_temperature = int(float(thermostat._hold_temperature))
+    hold_temperature = float(thermostat._hold_temperature)
     response = thermostat.json_request({"HOLD":[{"temp":hold_temperature, "id":"hass","hours":0,"minutes":0}, str(thermostat.name)]})
 
     if response:
@@ -340,7 +340,7 @@ async def async_handle_set_frost_temp_service(hass, call):
     """Handle set frost temp service calls."""
     entity_id = call.data[ATTR_ENTITY_ID]
     thermostat = get_entity_from_domain(hass, DOMAIN, entity_id)
-    frost_temperature = int(float(call.data["frost_temperature"]))
+    frost_temperature = float(call.data["frost_temperature"])
     response = thermostat.json_request({"SET_FROST": [frost_temperature, str(thermostat.name)]})
 
     if response:
@@ -516,7 +516,7 @@ class HeatmiserNeostat(ClimateEntity):
 
     def set_temperature(self, **kwargs):
         """ Set new target temperature. """
-        response = self.json_request({"SET_TEMP": [int(kwargs.get(ATTR_TEMPERATURE)), self._name]})
+        response = self.json_request({"SET_TEMP": [float(kwargs.get(ATTR_TEMPERATURE)), self._name]})
         if response:
             _LOGGER.info("set_temperature response: %s " % response)
             # Need check for success here
@@ -524,7 +524,7 @@ class HeatmiserNeostat(ClimateEntity):
 
     def set_temperature_e(self, **kwargs):
         """ Set new target temperature. """
-        response = self.json_request({"SET_TEMP": [int(kwargs.get(ATTR_TEMPERATURE)), self._name]})
+        response = self.json_request({"SET_TEMP": [float(kwargs.get(ATTR_TEMPERATURE)), self._name]})
         if response:
             _LOGGER.info("set_temperature response: %s " % response)
             # Need check for success here
