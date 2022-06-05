@@ -24,7 +24,9 @@ from homeassistant.components.media_player.const import (
 
 from homeassistant.components.media_player import (
     PLATFORM_SCHEMA,
-    MediaPlayerEntity)
+    MediaPlayerEntity,
+    async_process_play_media_url,
+)
 from homeassistant.const import (ATTR_ATTRIBUTION,
                                  ATTR_ENTITY_ID,
                                  CONF_NAME,
@@ -213,15 +215,24 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
     return True
 
 def get_http_resp(requestName, url, params):
-    _LOGGER.info("Sending " + requestName + " http get request: " + url + " | parameters: " + str(params))
+    if requestName == "update":
+        _LOGGER.debug("Sending " + requestName + " http get request: " + url + " | parameters: " + str(params))
+    else:
+        _LOGGER.info("Sending " + requestName + " http get request: " + url + " | parameters: " + str(params))
     try:
         resp = requests.get(url=url, params = params)
         _LOGGER.debug('Received ' + requestName + ' response code: ' + str(resp.status_code))
         _LOGGER.debug('Received ' + requestName + ' text response: ' + resp.text)
-        if resp.status_code != requests.codes.ok:
-            _LOGGER.info('Received ' + requestName + ' is failed')
+        if requestName == "update":
+            if resp.status_code != requests.codes.ok:
+                _LOGGER.debug('Received ' + requestName + ' is failed')
+            else:
+                _LOGGER.debug('Received ' + requestName + ' is successful')
         else:
-            _LOGGER.info('Received ' + requestName + ' is successful')
+            if resp.status_code != requests.codes.ok:
+                _LOGGER.info('Received ' + requestName + ' is failed')
+            else:
+                _LOGGER.info('Received ' + requestName + ' is successful')
         return resp
     except Exception as e:
         _LOGGER.info('Failed to initiate ' + requestName + ' request, got error:' + str(e))
@@ -452,7 +463,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         else:
             self.update()
 
-    def play_media(self, media_type, media_id, **kwargs):
+    async def async_play_media(self, media_type, media_id, **kwargs):
         """Send play commmand."""
         _LOGGER.info('play_media id: %s', media_id)
         _LOGGER.info('play_media type: %s', media_type)
@@ -461,11 +472,19 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         
         # Handle media_source
         if media_source.is_media_source_id(media_id):
-            media_id = media_id.replace("media-source://media_source/local","/media")
-            media_type = MEDIA_TYPE_MUSIC
+            sourced_media = await media_source.async_resolve_media(self.hass, media_id)
+            media_type = sourced_media.mime_type
+            media_id = sourced_media.url
+            _LOGGER.info('New play_media id: %s', media_id)
+            _LOGGER.info('New play_media type: %s', media_type)
+            #media_id = media_id.replace("media-source://media_source/local","/media")
+            #media_type = MEDIA_TYPE_MUSIC
+        # If media ID is a relative URL, we serve it from HA.
+        media_id = async_process_play_media_url(self.hass, media_id)
+        _LOGGER.info('New New play_media id: %s', media_id)
 
         # Handle Music Media
-        if media_type == MEDIA_TYPE_MUSIC:
+        if media_type == MEDIA_TYPE_MUSIC or media_type == "audio/mpeg":
 
             #if googleTTSCachedFile.match(media_id):
             #    _LOGGER.debug('play_media file matched Google TTS cached url.')
@@ -487,11 +506,12 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
                 'repeatNum': self._repeat_num_for_tts,
                 'priority': DEFAULT_MEDIA_PRIORITY
             }
-            resp = get_http_resp('media_media', url, params)
-        if resp.text == "successful":
-            self._current = STATE_PLAYING
-        else:
-            self.update()
+            #resp = get_http_resp('media_media', url, params)
+            resp =  await self.hass.async_add_executor_job(get_http_resp, 'media_media', url, params)
+            if resp.text == "successful":
+                self._current = STATE_PLAYING
+            else:
+                self.update()
 
 
     @util.Throttle(MIN_TIME_BETWEEN_SCANS, MIN_TIME_BETWEEN_FORCED_SCANS)
@@ -559,4 +579,6 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
             media_content_id,
             content_filter=lambda item: item.media_content_type.startswith("audio/"),
         )
+
+
 
