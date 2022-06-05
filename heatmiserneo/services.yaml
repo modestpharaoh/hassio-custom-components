@@ -30,7 +30,7 @@ hold_temperature:
             example: 'climate.kitchen'
         hold_temperature:
             description: The required hold temperature.
-            example: '16'
+            example: '16.5'
         hold_hours:
             description: Number of hours to hold temperature for.
             example: '3'
@@ -51,4 +51,4 @@ set_frost_temperature:
             example: 'climate.kitchen'
         frost_temperature:
             description: The required frost temperature.
-            example: '16'
+            example: '16.5'
