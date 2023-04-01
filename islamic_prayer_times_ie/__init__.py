@@ -72,9 +72,12 @@ async def async_unload_entry(hass, config_entry):
     hass.data.pop(DOMAIN)
     return await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
 
-def formatTime(timeList):
-    return str(timeList[0]).zfill(2) + ':' + str(timeList[1]).zfill(2)
-
+# Convert a list of hour/minutes of a prayer to time in format 01:07.
+# Inputs:
+#   timelist: [hour Integer, Minutes Integer]
+#   offset: +/- Integer of hour offset correction
+def formatTime(timeList, offset):
+    return str(timeList[0] + offset).zfill(2) + ': ' + str(timeList[1]).zfill(2)
 
 
 class IslamicPrayerClient:
@@ -124,8 +127,19 @@ class IslamicPrayerClient:
                 isna_prayers = calc.fetch_prayer_times()
                 #_LOGGER.info("ISNA Prayers: " + str(isna_prayers) + " " + str(type(isna_prayers)))
                 midnight = isna_prayers['Midnight']
+                _LOGGER.info('Midnight from ISNA calculation: ' + midnight)
+
+                # As ICCI timetable may consider DST time from 1st of April to
+                # end of October, and it supposed to start of last Sunday in
+                # March, and end last Sunday of October. There is a few days
+                # at end of March/October will be shift +/-1 hour.
+                # Maghrib is consider same for all calculation, so will try to
+                # compare ICCI with ISNA ones, and use that offset to fix all.
+                # Prayers.
+                isna_maghrib = isna_prayers['Maghrib']
+                _LOGGER.info('Maghrib from ISNA calculation: ' + isna_maghrib)
             except Exception as e:
-                _LOGGER.info('Failed to extract midnight from ISNA calculation:' + str(e))
+                _LOGGER.info('Failed to extract midnight/maghrib from ISNA calculation: ' + str(e))
             
             current_month = datetime.today().strftime("%-m")
             current_day = datetime.today().strftime("%-d")
@@ -139,23 +153,45 @@ class IslamicPrayerClient:
                     _LOGGER.debug('islamireland was successful')
                 json_resp = resp.json()
             except Exception as e:
-                _LOGGER.info('islamireland request exception raised, got error:' + str(e))
+                _LOGGER.info('islamireland request exception raised, got error: ' + str(e))
             if json_resp is not None:
                 try:
                     prayers = json_resp['timetable'][current_month][current_day]
-                    prayer_times_info = {'Fajr': formatTime(prayers[0]), 
-                    'Sunrise': formatTime(prayers[1]),
-                    'Dhuhr': formatTime(prayers[2]),
-                    'Asr': formatTime(prayers[3]), 
-                    'Sunset': formatTime(prayers[4]),
-                    'Maghrib': formatTime(prayers[4]),
-                    'Isha': formatTime(prayers[5]),
-                    'Imsak': formatTime(prayers[4]), 
+                    icci_maghrib = formatTime(prayers[4], 0)
+                    _LOGGER.info('Maghrib from ICCI calculation: ' + icci_maghrib)
+
+                    # Get different between ISNA/ICCI Maghrib in seconds
+                    icci = datetime.strptime(icci_maghrib, '%H:%M')
+                    isna = datetime.strptime(isna_maghrib, '%H:%M')
+                    
+                    hr_offset = 0
+                    maghrib_delta = 0
+                    # if you subtract the bigger timestamp from smaller, you will get one day of seconds
+                    if icci > isna:
+                        maghrib_delta = ( icci - isna ).seconds
+                        if maghrib_delta > 900 :
+                            hr_offset = -1
+                    if icci <= isna:
+                        maghrib_delta = ( isna - icci ).seconds
+                        if maghrib_delta > 900 :
+                            hr_offset = 1
+                    _LOGGER.info('Seconds different between ISNA and ICCI: ' + str(maghrib_delta))
+                    _LOGGER.info('Offset for ICCI: ' + str(hr_offset))
+
+                    prayer_times_info = {'Fajr': formatTime(prayers[0], hr_offset), 
+                    'Sunrise': formatTime(prayers[1], hr_offset),
+                    'Dhuhr': formatTime(prayers[2], hr_offset),
+                    'Asr': formatTime(prayers[3], hr_offset), 
+                    'Sunset': formatTime(prayers[4], hr_offset),
+                    'Maghrib': formatTime(prayers[4], hr_offset),
+                    'Isha': formatTime(prayers[5], hr_offset),
+                    'Imsak': formatTime(prayers[4], hr_offset), 
                     'Midnight': midnight}
+
                     _LOGGER.debug(prayer_times_info)
                     return prayer_times_info
                 except Exception as e:
-                    _LOGGER.info('Failed to retrive prayer from ICCI, failed to parse prayers from JSON:' + str(e))
+                    _LOGGER.info('Failed to retrive prayer from ICCI, failed to parse prayers from JSON: ' + str(e))
                     return isna_prayers
             else:
                 _LOGGER.info('Failed to retrive prayer from ICCI, JSON response is None.')
