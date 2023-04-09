@@ -77,7 +77,7 @@ async def async_unload_entry(hass, config_entry):
 #   timelist: [hour Integer, Minutes Integer]
 #   offset: +/- Integer of hour offset correction
 def formatTime(timeList, offset):
-    return str(timeList[0] + offset).zfill(2) + ': ' + str(timeList[1]).zfill(2)
+    return str(timeList[0] + offset).zfill(2) + ':' + str(timeList[1]).zfill(2)
 
 
 class IslamicPrayerClient:
