@@ -1,10 +1,11 @@
 {
   "domain": "islamic_prayer_times_ie",
   "name": "Islamic Prayer Times - IE",
-  "documentation": "https://github.com/modestpharaoh/hassio-custom-components/tree/main/islamic_prayer_times_ie",
-  "requirements": ["prayer_times_calculator==0.0.5"],
   "codeowners": ["@modestpharaoh"],
   "config_flow": true,
+  "documentation": "https://github.com/modestpharaoh/hassio-custom-components/tree/main/islamic_prayer_times_ie",
   "iot_class": "cloud_polling",
-  "version": "1.2.0"
+  "loggers": ["prayer_times_calculator_ie"],
+  "requirements": ["prayer_times_calculator==0.0.6"],
+  "version": "1.4.0"
 }
