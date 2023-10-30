@@ -1,9 +1,0 @@
-{
-  "domain": "heatmiserneo",
-  "name": "Heatmiser Neo Climate",
-  "documentation": "https://github.com/modestpharaoh/hassio-custom-components/tree/main/heatmiserneo",
-  "dependencies": [],
-  "codeowners": ["ModestPharaoh"],
-  "requirements": [],
-  "version": "1.2.0"
-}

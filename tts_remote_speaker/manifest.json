@@ -1,9 +1,0 @@
-{
-    "domain": "tts_remote_speaker",
-    "name": "Remote Speaker",
-    "documentation": "https://github.com/modestpharaoh/hassio-custom-components/tree/main/tts_remote_speaker",
-    "dependencies": [],
-    "codeowners": ["modestpharaoh"],
-    "requirements": [],
-    "version": "1.6.0"
-}
