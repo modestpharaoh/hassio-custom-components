@@ -4,6 +4,7 @@
   "codeowners": ["@amaharek"],
   "config_flow": true,
   "documentation": "https://github.com/amaharek/Ireland-ICC-Prayer-Times-Home-Assistant",
+  "issue_tracker": "https://github.com/amaharek/Ireland-ICC-Prayer-Times-Home-Assistant/issues",
   "iot_class": "cloud_polling",
   "loggers": ["prayer_times_calculator_ie"],
   "requirements": ["prayer_times_calculator==0.0.6"],
