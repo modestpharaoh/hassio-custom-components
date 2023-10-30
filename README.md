@@ -15,3 +15,4 @@ along with other calculation methods ignored in the built-in one such as Egypt, 
 ## Credits
 * Orignal Maintainer of the built-in component: [engrbm87](https://github.com/engrbm87)
 * Modified by [modestpharaoh](https://github.com/modestpharaoh)
+* Modified by [amaharek](https://github.com/amaharek)
