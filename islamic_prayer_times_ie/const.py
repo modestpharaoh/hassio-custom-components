@@ -11,6 +11,6 @@ CONF_CALC_METHOD: Final = "calculation_method"
 
 CALC_METHODS = ["jafari", "karachi", "isna", "mwl", "makkah", "egypt", "tehran", "gulf", "kuwait", "qatar", "singapore", "france", "turkey", "russia", "ie-icci", "ie-mcnd"]
 
-DEFAULT_CALC_METHOD: Final = "ie-icci"
+DEFAULT_CALC_METHOD: Final = "ie-mcnd"
 
 DATA_UPDATED = "Islamic_prayer_data_updated"
