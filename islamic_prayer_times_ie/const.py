@@ -9,12 +9,8 @@ PRAYER_TIMES_ICON = "mdi:calendar-clock"
 
 CONF_CALC_METHOD: Final = "calculation_method"
 
+CALC_METHODS = ["jafari", "karachi", "isna", "mwl", "makkah", "egypt", "tehran", "gulf", "kuwait", "qatar", "singapore", "france", "turkey", "russia", "ie-icci", "ie-mcnd"]
 
-#CALC_METHODS = ["isna", "karachi", "mwl", "makkah", "icci"]
-#CALC_METHODS: list[str] = list(PrayerTimesCalculator.CALCULATION_METHODS)
-
-CALC_METHODS = ["jafari", "karachi", "isna", "mwl", "makkah", "egypt", "tehran", "gulf", "kuwait", "qatar", "singapore", "france", "turkey", "russia", "icci"]
-
-DEFAULT_CALC_METHOD: Final = "icci"
+DEFAULT_CALC_METHOD: Final = "ie-mcnd"
 
 DATA_UPDATED = "Islamic_prayer_data_updated"
