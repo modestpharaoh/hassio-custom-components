@@ -120,6 +120,41 @@ def get_hr_offset_fix(non_stand_str, stand_str):
     _LOGGER.info('DST offset fix in hours: ' + str(hr_offset))
     return hr_offset
 
+# getPrayersByWPPlugin gets the prayers from a WordPress site with the
+# Daily Prayer Time plugin: https://wordpress.org/plugins/daily-prayer-time-for-mosques/
+# This is used by mcnd.ie & hicc.ie
+def getPrayersByWPPlugin(url, name, st_maghrib, midnight):
+    json_resp = get_json_resp(url)
+    _LOGGER.debug(json_resp)
+    if json_resp is not None:
+        try:
+            wp_prayers = json_resp[0]
+            wp_fajr = get_time_list(wp_prayers['fajr_begins'][0:5])
+            wp_sunrise = get_time_list(wp_prayers['sunrise'][0:5])
+            wp_dhuhr = get_time_list(wp_prayers['zuhr_begins'][0:5])
+            wp_asr = get_time_list(wp_prayers['asr_mithl_1'][0:5])
+            wp_maghrib = get_time_list(wp_prayers['maghrib_begins'][0:5])
+            wp_isha = get_time_list(wp_prayers['isha_begins'][0:5])
+
+            # get fixed offset
+            hr_offset = get_hr_offset_fix(wp_prayers['maghrib_begins'][0:5], st_maghrib)
+            
+            prayer_times_info = {'Fajr': formatTime(wp_fajr, hr_offset), 
+            'Sunrise': formatTime(wp_sunrise, hr_offset),
+            'Dhuhr': formatTime(wp_dhuhr, hr_offset),
+            'Asr': formatTime(wp_asr, hr_offset), 
+            'Sunset': formatTime(wp_maghrib, hr_offset),
+            'Maghrib': formatTime(wp_maghrib, hr_offset),
+            'Isha': formatTime(wp_isha, hr_offset),
+            'Imsak': formatTime(wp_maghrib, hr_offset), 
+            'Midnight': midnight}
+
+            _LOGGER.info(prayer_times_info)
+            return prayer_times_info
+        except Exception as e:
+            _LOGGER.info('Failed to retrieve prayer from ' + name + ', failed to parse prayers from JSON: ' + str(e))
+            return None
+
 class IslamicPrayerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, datetime]]):
     """Islamic Prayer Client Object."""
 
@@ -183,42 +218,19 @@ class IslamicPrayerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, datetim
             else:
                 _LOGGER.info('Failed to retrive prayer from ICCI, JSON response is None.')
                 return isna_prayers
-        # For Ireland MUSLIM COMMUNITY NORTH DUBLIN - Masjid
-        # 
-        elif calc_method == 'ie-mcnd':
+        # For Masjid that use WordPress Daily Prayer Time plugin
+        elif calc_method == 'ie-mcnd' or calc_method == 'ie-hicc':
             st_maghrib, midnight, isna_prayers = get_stand_sunset_midnight(self.hass.config.latitude,
                 self.hass.config.longitude, 'isna')
-            url = 'https://www.mcnd.ie/wp-json/dpt/v1/prayertime?mcnd.ie/wp-json/dpt/v1/prayertime&filter=today'
-            json_resp = get_json_resp(url)
-            _LOGGER.debug(json_resp)
-            if json_resp is not None:
-                try:
-                    mcdn_prayers = json_resp[0]
-                    mcdn_fajr = get_time_list(mcdn_prayers['fajr_begins'][0:5])
-                    mcdn_sunrise = get_time_list(mcdn_prayers['sunrise'][0:5])
-                    mcdn_dhuhr = get_time_list(mcdn_prayers['zuhr_begins'][0:5])
-                    mcdn_asr = get_time_list(mcdn_prayers['asr_mithl_1'][0:5])
-                    mcdn_maghrib = get_time_list(mcdn_prayers['maghrib_begins'][0:5])
-                    mcdn_isha = get_time_list(mcdn_prayers['isha_begins'][0:5])
-
-                    # get fixed offset
-                    hr_offset = get_hr_offset_fix(mcdn_prayers['maghrib_begins'][0:5], st_maghrib)
-                    
-                    prayer_times_info = {'Fajr': formatTime(mcdn_fajr, hr_offset), 
-                    'Sunrise': formatTime(mcdn_sunrise, hr_offset),
-                    'Dhuhr': formatTime(mcdn_dhuhr, hr_offset),
-                    'Asr': formatTime(mcdn_asr, hr_offset), 
-                    'Sunset': formatTime(mcdn_maghrib, hr_offset),
-                    'Maghrib': formatTime(mcdn_maghrib, hr_offset),
-                    'Isha': formatTime(mcdn_isha, hr_offset),
-                    'Imsak': formatTime(mcdn_maghrib, hr_offset), 
-                    'Midnight': midnight}
-
-                    _LOGGER.info(prayer_times_info)
-                    return prayer_times_info
-                except Exception as e:
-                    _LOGGER.info('Failed to retrieve prayer from MCDN, failed to parse prayers from JSON: ' + str(e))
-                    return isna_prayers
+            
+            url = 'https://mcnd.ie/wp-json/dpt/v1/prayertime?mcnd.ie/wp-json/dpt/v1/prayertime&filter=today'
+            if calc_method == 'ie-hicc':
+                url = 'https://hicc.ie/wp-json/dpt/v1/prayertime?mcnd.ie/wp-json/dpt/v1/prayertime&filter=today'
+            prayer_times_info = getPrayersByWPPlugin(url, calc_method, st_maghrib, midnight)
+            if prayer_times_info is None:
+                return isna_prayers
+            else:
+                return prayer_times_info
 
         # For standard calculation methods, we use fetch_prayer_times library
         # resp is Dict, sample: {'Fajr': '06:47', 'Sunrise': '08:37', 'Dhuhr': '12:22', 'Asr': '13:53', 'Sunset': '16:07', 'Maghrib': '16:07', 'Isha': '17:57', 'Imsak': '06:37', 'Midnight': '00:22'}
