@@ -13,24 +13,11 @@ import voluptuous as vol
 from homeassistant.components.climate.const import (
     ATTR_TARGET_TEMP_HIGH,
     ATTR_TARGET_TEMP_LOW,
-    CURRENT_HVAC_COOL,
-    CURRENT_HVAC_HEAT,
-    CURRENT_HVAC_IDLE,
-    CURRENT_HVAC_OFF,
+    ClimateEntityFeature,
     DOMAIN,
-    HVAC_MODE_COOL,
-    HVAC_MODE_HEAT,
-    HVAC_MODE_HEAT_COOL,
-    HVAC_MODE_OFF,
+    HVACAction,
+    HVACMode,
     HVAC_MODES,
-    SUPPORT_AUX_HEAT,
-    SUPPORT_FAN_MODE,
-    SUPPORT_PRESET_MODE,
-    SUPPORT_SWING_MODE,
-    SUPPORT_TARGET_HUMIDITY,
-    SUPPORT_TARGET_TEMPERATURE,
-    SUPPORT_TARGET_TEMPERATURE_RANGE,
-    HVAC_MODE_AUTO,
 )
 from homeassistant.const import (ATTR_ATTRIBUTION,
                                  ATTR_ENTITY_ID,
@@ -40,8 +27,7 @@ from homeassistant.const import (ATTR_ATTRIBUTION,
                                  CONF_PORT,
                                  STATE_OFF,
                                  STATE_ON,
-                                 TEMP_CELSIUS,
-                                 TEMP_FAHRENHEIT,
+                                 UnitOfTemperature,
 )
 import homeassistant.helpers.config_validation as cv
 
@@ -112,9 +98,9 @@ SERVICE_HOLD_TEMP_SCHEMA = vol.Schema(
 
 
 # Heatmiser does support all lots more stuff, but only heat for now.
-#hvac_modes=[HVAC_MODE_HEAT_COOL, HVAC_MODE_COOL, HVAC_MODE_HEAT, HVAC_MODE_OFF]
+# hvac_modes=[HVAC_MODE_HEAT_COOL, HVAC_MODE_COOL, HVAC_MODE_HEAT, HVAC_MODE_OFF]
 # Heatmiser doesn't really have an off mode - standby is a preset - implement later
-hvac_modes = [HVAC_MODE_HEAT]
+hvac_modes = [HVACMode.HEAT]
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -146,7 +132,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
 
     thermostats = []
 
-    NeoHubJson = HeatmiserNeostat(TEMP_CELSIUS, False, host, port).json_request({"INFO": 0})
+    NeoHubJson = HeatmiserNeostat(UnitOfTemperature.CELSIUS, False, host, port).json_request({"INFO": 0})
 
     _LOGGER.debug(NeoHubJson)
 
@@ -155,7 +141,7 @@ def setup_platform(hass, config, add_devices, discovery_info=None):
             name = device['device']
             tmptempfmt = device['TEMPERATURE_FORMAT']
             if (tmptempfmt == False) or (tmptempfmt.upper() == "C"):
-                temperature_unit = TEMP_CELSIUS
+                temperature_unit = UnitOfTemperature.CELSIUS
             else:
                 temperature_unit = TEMP_FAHRENHEIT
             away = device['AWAY']
@@ -362,7 +348,7 @@ async def async_handle_set_frost_temp_service(hass, call):
 
 async def async_handle_neo_update_service(hass, call, host, port):
     """Handle neo update service calls."""
-    hub = HeatmiserNeostat(TEMP_CELSIUS, False, host, port)
+    hub = HeatmiserNeostat(UnitOfTemperature.CELSIUS, False, host, port)
     hub.update()
 
 
@@ -389,7 +375,7 @@ class HeatmiserNeostat(ClimateEntity):
         self._output_delay = None
         self._hvac_modes = hvac_modes
         self._support_flags = SUPPORT_FLAGS
-        self._support_flags = self._support_flags | SUPPORT_TARGET_TEMPERATURE
+        self._support_flags = self._support_flags | ClimateEntityFeature.TARGET_TEMPERATURE
         self.update()
 
     @property
@@ -545,7 +531,7 @@ class HeatmiserNeostat(ClimateEntity):
               if self._name == device['device']:
                 tmptempfmt = device["TEMPERATURE_FORMAT"]
                 if (tmptempfmt == False) or (tmptempfmt.upper() == "C"):
-                  self._temperature_unit = TEMP_CELSIUS
+                  self._temperature_unit = UnitOfTemperature.CELSIUS
                 else:
                   self._temperature_unit = TEMP_FAHRENHEIT
                 self._away = device['AWAY']
@@ -565,19 +551,19 @@ class HeatmiserNeostat(ClimateEntity):
 
                 # Figure out the current mode based on whether cooling is enabled - should verify that this is correct
                 if device["COOLING_ENABLED"] == True:
-                    self._hvac_mode = HVAC_MODE_COOL
+                    self._hvac_mode = HVACMode.COOL
                 else:
-                    self._hvac_mode = HVAC_MODE_HEAT
+                    self._hvac_mode = HVACMode.HEAT
 
                 # Figure out current action based on Heating / Cooling flags
                 if device["HEATING"] == True:
-                    self._hvac_action = CURRENT_HVAC_HEAT
+                    self._hvac_action = HVACAction.HEATING
                     _LOGGER.debug("Heating")
                 elif device["COOLING"] == True:
-                    self._hvac_action = CURRENT_HVAC_COOL
+                    self._hvac_action = HVACAction.COOLING
                     _LOGGER.debug("Cooling")
                 else:
-                    self._hvac_action = CURRENT_HVAC_IDLE
+                    self._hvac_action = HVACAction.IDLE
                     _LOGGER.debug("Idle")
             if engResponse:
                 _LOGGER.debug("update() json engResponse: %s " % engResponse)
