@@ -1,0 +1,41 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Set up WordPress Daily Prayer Time",
+                "description": "Enter the endpoint URL for prayer time data.",
+                "data": {
+                    "endpoint": "Endpoint URL",
+                    "api_path": "API Path"
+                },
+                "data_description": {
+                    "endpoint": "WordPress Masjid website. e.g., https://masjid-site.com",
+                    "api_path": "API path for full year, usually wp-json/dpt/v1/prayertime?filter=year"
+                },
+                "errors": {
+                    "invalid_url": "Invalid URL. Please provide a valid HTTP or HTTPS URL."
+                }
+            }
+        },
+        "abort": {
+            "already_configured": "WordPress Daily Prayer Time is already configured for this endpoint."
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "endpoint": "Endpoint URL",
+                    "api_path": "API Path"
+                },
+                "data_description": {
+                    "endpoint": "WordPress Masjid website. e.g., https://masjid-site.com",
+                    "api_path": "API path for full year, usually wp-json/dpt/v1/prayertime?filter=year"
+                },
+                "errors": {
+                    "invalid_url": "Invalid URL. Please provide a valid HTTP or HTTPS URL."
+                }
+            }
+        }
+    }
+}
