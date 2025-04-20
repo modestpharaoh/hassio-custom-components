@@ -1,4 +1,7 @@
-# Hass.io Custom Component - Islamic Prayer Times -IE
+# Hass.io Custom Component - Islamic Prayer Times -IE (Deprecated)
+
+NOTE: This is a deprecated custom component, it is replaced by the wordpress_daily_prayer_time.
+
 This custom component is a forklift of the built-in Home Assistant Islamic Prayer Times component,
 but includes prayers times calculated by [Islamic Cultural Centre of Ireland: ICCI](https://islamireland.ie/)
 along with other calculation methods ignored in the built-in one such as Egypt, France ...etc.
@@ -20,4 +23,4 @@ along with other calculation methods ignored in the built-in one such as Egypt, 
 * Modified by [modestpharaoh](https://github.com/modestpharaoh)
 
 ## Disclamation
-* There is guarantee that the component will get the correct one, I always try my best to update, whenever there is a bug show up. 
+* There is no guarantee that the component will get the correct one, I always try my best to update, whenever there is a bug show up. 

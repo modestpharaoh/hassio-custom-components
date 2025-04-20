@@ -1,0 +1,11 @@
+{
+  "domain": "wordpress_daily_prayer_time",
+  "name": "WordPress Daily Prayer Time",
+  "codeowners": ["@modestpharaoh"],
+  "config_flow": true,
+  "documentation": "https://github.com/modestpharaoh/hassio-custom-components/tree/main/wordpress_daily_prayer_time",
+  "iot_class": "cloud_polling",
+  "loggers": ["wordpress_daily_prayer_time"],
+  "requirements": ["aiohttp", "aiofiles"],
+  "version": "1.0.0"
+}
