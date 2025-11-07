@@ -8,25 +8,16 @@ import voluptuous as vol
 
 from homeassistant import util
 from homeassistant.components import media_source
-from homeassistant.components.media_player.const import (
-    DOMAIN,
-    SUPPORT_BROWSE_MEDIA,
-    MEDIA_TYPE_MUSIC,
-    SUPPORT_PAUSE,
-    SUPPORT_PLAY,
-    SUPPORT_PLAY_MEDIA,
-    SUPPORT_SEEK,
-    SUPPORT_SELECT_SOURCE,
-    SUPPORT_STOP,
-    SUPPORT_VOLUME_SET,
-    SUPPORT_VOLUME_STEP,
-)
-
 from homeassistant.components.media_player import (
     PLATFORM_SCHEMA,
     MediaPlayerEntity,
+    MediaPlayerEntityFeature,
+    MediaType,
     async_process_play_media_url,
+    DOMAIN,
 )
+from homeassistant.exceptions import HomeAssistantError
+
 from homeassistant.const import (ATTR_ATTRIBUTION,
                                  ATTR_ENTITY_ID,
                                  CONF_NAME,
@@ -55,6 +46,7 @@ DEFAULT_NAME = 'TTS Remote Speaker'
 DEFAULT_VOLUME = 0.5
 DEFAULT_CACHE_DIR = "tts"
 DEFAULT_ADDRESS = ''
+MEDIA_TYPE_MUSIC = MediaType.MUSIC.value
 
 # Remote media player supports rpeating the messages for a number of times, this
 # will be extra repeats, means if it is 2 times, then total repeats will be 3.
@@ -79,14 +71,14 @@ DEFAULT_ANNOUNCEMENT_MUSIC = True
 DEFAULT_MEDIA_PRIORITY = 5
 
 SUPPORT_REMOTE_SPEAKER = (
-    SUPPORT_BROWSE_MEDIA
-    | SUPPORT_PLAY_MEDIA
-    | SUPPORT_PAUSE
-    | SUPPORT_PLAY
-    | SUPPORT_SELECT_SOURCE
-    | SUPPORT_STOP
-    | SUPPORT_VOLUME_SET
-    | SUPPORT_VOLUME_STEP
+    MediaPlayerEntityFeature.BROWSE_MEDIA
+    | MediaPlayerEntityFeature.PLAY_MEDIA
+    | MediaPlayerEntityFeature.PAUSE
+    | MediaPlayerEntityFeature.PLAY
+    | MediaPlayerEntityFeature.SELECT_SOURCE
+    | MediaPlayerEntityFeature.STOP
+    | MediaPlayerEntityFeature.VOLUME_SET
+    | MediaPlayerEntityFeature.VOLUME_STEP
 )
 
 SCAN_INTERVAL = timedelta(seconds=3)
@@ -273,7 +265,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
     def get_tts_cache_dir(self, cache_dir):
         """Get cache folder."""
         if not os.path.isabs(cache_dir):
-            cache_dir = hass.config.path(cache_dir)
+            cache_dir = self._hass.config.path(cache_dir)
         return cache_dir
 
     @property
@@ -300,7 +292,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         """Flag media player features that are supported."""
         support = SUPPORT_REMOTE_SPEAKER
         if self._current == STATE_PLAYING or self._current == STATE_PAUSED:
-            support |= SUPPORT_SEEK
+            support |= MediaPlayerEntityFeature.SEEK
         return support
 
     @property
@@ -381,7 +373,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         url = self._address + '/setVolume'
         params = {'volume': volume}
         resp = get_http_resp('set_volume_level', url, params)
-        if resp.text == "Volume set":
+        if resp is not None and resp.text == "Volume set":
             self._volume_level = volume
         else:
             self.update()
@@ -392,7 +384,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
             url = self._address + '/setPos'
             params = {'position': position}
             resp = get_http_resp('set_position', url, params)
-            if resp.text == "Position set":
+            if resp is not None and resp.text == "Position set":
                 self._media_position = position
                 self._media_position_updated_at = dt_util.utcnow()
             else:
@@ -426,7 +418,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         url = self._address + '/media_pause'
         resp = get_http_resp('media_pause', url, {})
         self._is_standby = False
-        if resp.text == "successful":
+        if resp is not None and resp.text == "successful":
             self._current = STATE_PAUSED
             self.update()
         else:
@@ -437,7 +429,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         url = self._address + '/media_play'
         resp = get_http_resp('media_play', url, {})
         self._is_standby = False
-        if resp.text == "successful":
+        if resp is not None and resp.text == "successful":
             self._current = STATE_PLAYING
             self.update()
         else:
@@ -448,7 +440,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         url = self._address + '/media_stop'
         resp = get_http_resp('media_stop', url, {})
         self._is_standby = False
-        if resp.text == "successful":
+        if resp is not None and resp.text == "successful":
             self._current = STATE_IDLE
         else:
             self.update()
@@ -458,7 +450,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         url = self._address + '/select_source'
         params = {'source': source}
         resp = get_http_resp('select_source', url, params)
-        if resp.text == "successful":
+        if resp is not None and resp.text == "successful":
             self._current_source = source
         else:
             self.update()
@@ -472,7 +464,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         
         # Handle media_source
         if media_source.is_media_source_id(media_id):
-            sourced_media = await media_source.async_resolve_media(self.hass, media_id)
+            sourced_media = await media_source.async_resolve_media(self._hass, media_id)
             media_type = sourced_media.mime_type
             media_id = sourced_media.url
             _LOGGER.info('New play_media id: %s', media_id)
@@ -480,7 +472,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
             #media_id = media_id.replace("media-source://media_source/local","/media")
             #media_type = MEDIA_TYPE_MUSIC
         # If media ID is a relative URL, we serve it from HA.
-        media_id = async_process_play_media_url(self.hass, media_id)
+        media_id = async_process_play_media_url(self._hass, media_id)
         _LOGGER.info('New New play_media id: %s', media_id)
 
         # Handle Music Media
@@ -507,8 +499,8 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
                 'priority': DEFAULT_MEDIA_PRIORITY
             }
             #resp = get_http_resp('media_media', url, params)
-            resp =  await self.hass.async_add_executor_job(get_http_resp, 'media_media', url, params)
-            if resp.text == "successful":
+            resp = await self._hass.async_add_executor_job(get_http_resp, 'media_media', url, params)
+            if resp is not None and resp.text == "successful":
                 self._current = STATE_PLAYING
             else:
                 self.update()
@@ -521,49 +513,53 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
         url = self._address + '/getUpdate'
         params = {}
         resp = get_http_resp('update', url, params)
+        if resp is None:
+            _LOGGER.debug('No response from speaker update')
+            self._current = STATE_IDLE
+            return
         try:
-            if resp.json()['state'] == 'STATE_PLAYING':
+            if resp.json().get('state') == 'STATE_PLAYING':
                 _LOGGER.debug('State is playing')
                 self._current = STATE_PLAYING
-            elif resp.json()['state'] == 'STATE_PAUSED':
+            elif resp.json().get('state') == 'STATE_PAUSED':
                 _LOGGER.debug('State is paused')
                 self._current = STATE_PAUSED
             else:
                 _LOGGER.debug('State is stopped')
                 self._current = STATE_IDLE
-        except:
+        except Exception:
             _LOGGER.debug('Failed to get state, state is stopped')
             self._current = STATE_IDLE
         try:
-            self._volume_level = float(resp.json()['volume'])
-        except:
+            self._volume_level = float(resp.json().get('volume', self._volume_level))
+        except Exception:
             _LOGGER.debug('Failed to get the volume level')
         try:
-            self._source_list = sorted(resp.json()['sources'])
-        except:
+            self._source_list = sorted(resp.json().get('sources', []))
+        except Exception:
             _LOGGER.debug('Failed to get the sources lists')
         try:
-            self._current_source = resp.json()['current_source']
-        except:
+            self._current_source = resp.json().get('current_source')
+        except Exception:
             _LOGGER.debug('Failed to get current source')
         try:
-            self._current_priority = resp.json()['current_priority']
-        except:
-            self._current_priority = str(0)
+            self._current_priority = resp.json().get('current_priority', 0)
+        except Exception:
+            self._current_priority = 0
             _LOGGER.debug('Failed to get priority of current source')
         if self._current == STATE_PLAYING or self._current == STATE_PAUSED:
             try:
-                self._media_duration = float(resp.json()['duration'])
-            except:
+                self._media_duration = float(resp.json().get('duration'))
+            except Exception:
                 self._media_duration = None
                 _LOGGER.debug('Failed to get duration of current source')
         else:
             self._media_duration = None
         if self._current == STATE_PLAYING or self._current == STATE_PAUSED:
             try:
-                self._media_position = float(resp.json()['position'])
+                self._media_position = float(resp.json().get('position'))
                 self._media_position_updated_at = dt_util.utcnow()
-            except:
+            except Exception:
                 self._media_position = None
                 self._media_position_updated_at = None
                 _LOGGER.debug('Failed to get position of the current source')
@@ -575,10 +571,7 @@ class RemoteSpeakerDevice(MediaPlayerEntity):
     async def async_browse_media(self, media_content_type=None, media_content_id=None):
         """Implement the websocket media browsing helper."""
         return await media_source.async_browse_media(
-            self.hass,
+            self._hass,
             media_content_id,
             content_filter=lambda item: item.media_content_type.startswith("audio/"),
         )
-
-
-
