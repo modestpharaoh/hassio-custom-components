@@ -1,4 +1,7 @@
-# Hass.io Custom Component - Remote Speaker
+# Hass.io Custom Component - Remote Speaker (Deprecated)
+
+**This component is deprecated, please use the home assistant VLC add-on instead.**
+
 This custom component is the API component that adds a media player which interact with 
 my custom local media player add-on [Remote Speaker](https://github.com/modestpharaoh/hassio-addons/tree/master/remote_speaker).
 
