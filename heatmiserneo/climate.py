@@ -297,9 +297,8 @@ async def async_handle_hold_temperature_service(hass, call):
         lambda: thermostat.json_request({"HOLD":[{"temp":hold_temperature, "id":"hass","hours":hold_hours,"minutes":hold_minutes}, str(thermostat.name)]})
     )
     
-    # We should probably update the state
-    thermostat.update_without_throttle = True
-    thermostat.schedule_update_ha_state()
+    # Force refresh
+    await thermostat.async_update_ha_state(force_refresh=True)
 
 async def async_handle_cancel_hold_service(hass, call):
     """Handle cancel hold service calls."""
@@ -313,8 +312,8 @@ async def async_handle_cancel_hold_service(hass, call):
         lambda: thermostat.json_request({"HOLD":[{"temp":hold_temperature, "id":"hass","hours":0,"minutes":0}, str(thermostat.name)]})
     )
     
-    thermostat.update_without_throttle = True
-    thermostat.schedule_update_ha_state()
+    # Force refresh
+    await thermostat.async_update_ha_state(force_refresh=True)
 
 
 async def async_handle_activate_frost_service(hass, call):
@@ -328,8 +327,8 @@ async def async_handle_activate_frost_service(hass, call):
         lambda: thermostat.json_request({"FROST_ON": str(thermostat.name)})
     )
     
-    thermostat.update_without_throttle = True
-    thermostat.schedule_update_ha_state()
+    # Force refresh
+    await thermostat.async_update_ha_state(force_refresh=True)
 
 async def async_handle_cancel_frost_service(hass, call):
     """Handle cancel frost service calls."""
@@ -342,8 +341,8 @@ async def async_handle_cancel_frost_service(hass, call):
         lambda: thermostat.json_request({"FROST_OFF": str(thermostat.name)})
     )
     
-    thermostat.update_without_throttle = True
-    thermostat.schedule_update_ha_state()
+    # Force refresh
+    await thermostat.async_update_ha_state(force_refresh=True)
 
 async def async_handle_set_frost_temp_service(hass, call):
     """Handle set frost temp service calls."""
@@ -357,8 +356,8 @@ async def async_handle_set_frost_temp_service(hass, call):
         lambda: thermostat.json_request({"SET_FROST": [frost_temperature, str(thermostat.name)]})
     )
     
-    thermostat.update_without_throttle = True
-    thermostat.schedule_update_ha_state()
+    # Force refresh
+    await thermostat.async_update_ha_state(force_refresh=True)
 
 async def async_handle_neo_update_service(hass, call, host, port):
     """Handle neo update service calls."""
@@ -531,19 +530,26 @@ class HeatmiserNeostat(ClimateEntity):
 
     def set_temperature(self, **kwargs):
         """ Set new target temperature. """
-        response = self.json_request({"SET_TEMP": [float(kwargs.get(ATTR_TEMPERATURE)), self._name]})
+        # This is legacy sync method, we should use async_set_temperature
+        pass
+        
+    async def async_set_temperature(self, **kwargs):
+        """ Set new target temperature. """
+        response = await self.hass.async_add_executor_job(
+            lambda: self.json_request({"SET_TEMP": [float(kwargs.get(ATTR_TEMPERATURE)), self._name]})
+        )
         if response:
             _LOGGER.info("set_temperature response: %s " % response)
             # Need check for success here
             # {'result': 'temperature was set'}
+            
+        # Force refresh
+        await self.async_update_ha_state(force_refresh=True)
 
     def set_temperature_e(self, **kwargs):
         """ Set new target temperature. """
-        response = self.json_request({"SET_TEMP": [float(kwargs.get(ATTR_TEMPERATURE)), self._name]})
-        if response:
-            _LOGGER.info("set_temperature response: %s " % response)
-            # Need check for success here
-            # {'result': 'temperature was set'}
+        # This seems to be unused or legacy
+        pass
 
     def update(self):
         """ Get Updated Info. """

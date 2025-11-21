@@ -8,6 +8,14 @@
                     "host": "Host",
                     "port": "Port"
                 }
+            },
+            "reconfigure": {
+                "title": "Reconfigure Heatmiser Neo",
+                "description": "Update the IP address and port of your Heatmiser Neo Hub.",
+                "data": {
+                    "host": "Host",
+                    "port": "Port"
+                }
             }
         },
         "error": {

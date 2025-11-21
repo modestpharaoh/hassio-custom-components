@@ -34,3 +34,20 @@ class HeatmiserNeoConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=DATA_SCHEMA, errors=errors
         )
+
+    async def async_step_reconfigure(self, user_input: dict[str, any] = None) -> FlowResult:
+        """Handle a reconfiguration flow initialized by the user."""
+        errors = {}
+        if user_input is not None:
+            return self.async_update_reload_and_abort(
+                self._get_reconfigure_entry(),
+                data_updates=user_input,
+            )
+
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=self.add_suggested_values_to_schema(
+                DATA_SCHEMA, self._get_reconfigure_entry().data
+            ),
+            errors=errors,
+        )
