@@ -2,41 +2,58 @@
 
 activate_frost:
     description: Activate standby mode on heatmiser thermostat.
-    fields:
-        entity_id:
-            description: Thermostat Entity ID.
-            example: 'climate.kitchen'
+    target:
+        entity:
+            integration: heatmiserneo
+            domain: climate
 
 cancel_frost:
     description: Cancel standby mode on heatmiser thermostat.
-    fields:
-        entity_id:
-            description: Thermostat Entity ID.
-            example: 'climate.kitchen'
+    target:
+        entity:
+            integration: heatmiserneo
+            domain: climate
 
 cancel_hold:
     description: Cancel hold temperature on heatmiser thermostat and return to original set temperature.
-    fields:
-        entity_id:
-            description: Thermostat Entity ID.
-            example: 'climate.kitchen'
+    target:
+        entity:
+            integration: heatmiserneo
+            domain: climate
 
 
 hold_temperature:
     description: Activate hold temperature on heatmiser thermostat for certain time and temperature
+    target:
+        entity:
+            integration: heatmiserneo
+            domain: climate
     fields:
-        entity_id:
-            description: Thermostat Entity ID.
-            example: 'climate.kitchen'
         hold_temperature:
             description: The required hold temperature.
             example: '16.5'
+            selector:
+                number:
+                    min: 5
+                    max: 35
+                    step: 0.5
+                    unit_of_measurement: "°C"
         hold_hours:
             description: Number of hours to hold temperature for.
             example: '3'
+            selector:
+                number:
+                    min: 0
+                    max: 24
+                    step: 1
         hold_minutes:
             description: Number of minutes to hold temperature for.
             example: '30'
+            selector:
+                number:
+                    min: 0
+                    max: 59
+                    step: 1
 
 
 neo_update:
@@ -45,10 +62,17 @@ neo_update:
 
 set_frost_temperature:
     description: Only set the frost temoerature, without activating it .
+    target:
+        entity:
+            integration: heatmiserneo
+            domain: climate
     fields:
-        entity_id:
-            description: Thermostat Entity ID.
-            example: 'climate.kitchen'
         frost_temperature:
             description: The required frost temperature.
             example: '16.5'
+            selector:
+                number:
+                    min: 5
+                    max: 35
+                    step: 0.5
+                    unit_of_measurement: "°C"

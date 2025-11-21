@@ -2,8 +2,13 @@
   "domain": "heatmiserneo",
   "name": "Heatmiser Neo Climate",
   "documentation": "https://github.com/modestpharaoh/hassio-custom-components/tree/main/heatmiserneo",
+  "integration_type": "hub",
   "dependencies": [],
-  "codeowners": ["ModestPharaoh"],
+  "codeowners": [
+    "ModestPharaoh"
+  ],
   "requirements": [],
-  "version": "1.3.0"
+  "version": "3.0.0",
+  "config_flow": true,
+  "iot_class": "local_polling"
 }

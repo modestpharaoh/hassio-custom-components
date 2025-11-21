@@ -1,5 +1,26 @@
-# HeatmiserNeo-HomeAssistant
-Heatmiser Neostat custom component for Home Assistant.
+# Heatmiser Neo for Home Assistant
+
+This integration provides support for Heatmiser Neo thermostats in Home Assistant.
+
+## Features
+- **Climate Entity**: Control temperature, hold mode, and frost protection.
+- **Switch Entity**: Toggle Standby mode for each thermostat.
+- **Sensors**: Monitor Hold Status and Hold Time remaining.
+- **Config Flow**: Easy setup via the UI.
+- **Reconfigure**: Change host/port via UI.
+- **Services**: Custom services for advanced control (Hold, Frost, etc.) under the heatmiserneo domain.
+
+## Installation
+1. Copy the `heatmiserneo` folder to your `custom_components` directory.
+2. Restart Home Assistant.
+3. Add the integration via Settings -> Devices & Services -> Add Integration -> Heatmiser Neo.
+
+## Entities
+For each thermostat, the following entities are created:
+- `climate.<thermostat_name>`: The main thermostat control.
+- `switch.<thermostat_name>_standby`: Switch to enable/disable Standby mode.
+- `binary_sensor.<thermostat_name>_hold_status`: Indicates if Hold mode is active.
+- `sensor.<thermostat_name>_hold_time`: Shows remaining Hold time (or 00:00).
 
 ## References
 
@@ -21,30 +42,3 @@ docomentation in RJ/heatmiser-neohub.py
 * Supports hold/cancel the temperature of neostat thermostat to certain degree and time by custom services.
 * Supports to activate/cancel the standby mode on the neostat thermostat by custom services.
 * Supports force query of neo-hub by custom service.
-
-## Installation
-
-Navigate to the custom_components directory for Home Assistant
-```
-cd /config/custom_components
-git clone https://github.com/modestpharaoh/HeatmiserNeo-HomeAssistant
-mv HeatmiserNeo-HomeAssistant heatmiserneo
-```
-
-As per example_configuration.yaml, add the following to the configuration.yaml in your /config directory.
-
-```yaml
-climate:
-  - platform: heatmiserneo
-    host: <Insert IP Address / Hostname>
-    port: 4242
-```
-
-## Custom Services Example
-Check services.yaml for examples of the following custom services:
-* heatmiser.activate_frost
-* heatmiser.cancel_frost
-* heatmiser.cancel_hold
-* heatmiser.hold_temp
-* heatmiser.neo_update
-* heatmiser.set_frost_temp
