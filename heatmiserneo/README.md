@@ -21,6 +21,11 @@ For each thermostat, the following entities are created:
 - `switch.<thermostat_name>_standby`: Switch to enable/disable Standby mode.
 - `binary_sensor.<thermostat_name>_hold_status`: Indicates if Hold mode is active.
 - `sensor.<thermostat_name>_hold_time`: Shows remaining Hold time (or 00:00).
+- `number.<thermostat_name>_frost_temperature`: Configure Frost Temperature (5-17°C).
+- `sensor.<thermostat_name>_current_temperature`: Current temperature reading.
+- `sensor.<thermostat_name>_target_temperature`: Current target temperature.
+- `sensor.<thermostat_name>_switching_differential`: Switching differential setting.
+- `sensor.<thermostat_name>_output_delay`: Output delay setting.
 
 ## References
 

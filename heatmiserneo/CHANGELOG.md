@@ -8,4 +8,6 @@
 - periodic update is now every 30s.
 - Added Standby Switch for each thermostat.
 - Added Hold Status and Hold Time sensors for each thermostat.
+- Added Number entity for Frost Temperature configuration (5-17°C).
+- Added sensors for Current Temp, Target Temp, Switching Differential, and Output Delay.
 - Refactored to use DataUpdateCoordinator for better performance.
