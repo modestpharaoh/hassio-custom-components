@@ -38,8 +38,6 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-VERSION = '3.0.0'
-
 SUPPORT_FLAGS = 0
 
 ATTRIBUTION = "Data provided by Heatmiser Neo"
