@@ -5,3 +5,4 @@
 - Related actions has the fields configured for easy action.
 - Reconfigure support.
 - Force update to the thermostats on any change to thermostat via the integration.
+- periodic update is now every 30s.

@@ -31,11 +31,14 @@ from homeassistant.const import (ATTR_ATTRIBUTION,
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.entity import DeviceInfo
 
+from datetime import timedelta
 import socket
 import json
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
+
+SCAN_INTERVAL = timedelta(seconds=30)
 
 VERSION = '3.0.0'
 
