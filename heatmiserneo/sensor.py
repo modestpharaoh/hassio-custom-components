@@ -69,6 +69,11 @@ class HeatmiserNeoHoldSensor(CoordinatorEntity, BinarySensorEntity):
             return self.data.get("TEMP_HOLD")
         return False
 
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend."""
+        return "mdi:car-brake-hold"
+
 class HeatmiserNeoHoldTimeSensor(CoordinatorEntity, SensorEntity):
     """Represents a Heatmiser NeoStat Hold Time Sensor."""
 

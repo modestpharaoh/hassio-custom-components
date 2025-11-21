@@ -67,6 +67,11 @@ class HeatmiserNeoStandbySwitch(CoordinatorEntity, SwitchEntity):
             return self.data.get("STANDBY")
         return False
 
+    @property
+    def icon(self):
+        """Return the icon to use in the frontend."""
+        return "mdi:snowflake"
+
     async def async_turn_on(self, **kwargs):
         """Turn the switch on (Activate Standby)."""
         await self.hass.async_add_executor_job(
