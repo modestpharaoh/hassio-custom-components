@@ -1,5 +1,26 @@
-# HeatmiserNeo-HomeAssistant
-Heatmiser Neostat custom component for Home Assistant.
+# Heatmiser Neo for Home Assistant
+
+This integration provides support for Heatmiser Neo thermostats in Home Assistant.
+
+## Features
+- **Climate Entity**: Control temperature, hold mode, and frost protection.
+- **Switch Entity**: Toggle Standby mode for each thermostat.
+- **Sensors**: Monitor Hold Status and Hold Time remaining.
+- **Config Flow**: Easy setup via the UI.
+- **Reconfigure**: Change host/port via UI.
+- **Services**: Custom services for advanced control (Hold, Frost, etc.).
+
+## Installation
+1. Copy the `heatmiserneo` folder to your `custom_components` directory.
+2. Restart Home Assistant.
+3. Add the integration via Settings -> Devices & Services -> Add Integration -> Heatmiser Neo.
+
+## Entities
+For each thermostat, the following entities are created:
+- `climate.<thermostat_name>`: The main thermostat control.
+- `switch.<thermostat_name>_standby`: Switch to enable/disable Standby mode.
+- `binary_sensor.<thermostat_name>_hold_status`: Indicates if Hold mode is active.
+- `sensor.<thermostat_name>_hold_time`: Shows remaining Hold time (or 00:00).
 
 ## References
 

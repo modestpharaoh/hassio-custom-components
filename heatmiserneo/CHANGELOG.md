@@ -6,3 +6,6 @@
 - Reconfigure support.
 - Force update to the thermostats on any change to thermostat via the integration.
 - periodic update is now every 30s.
+- Added Standby Switch for each thermostat.
+- Added Hold Status and Hold Time sensors for each thermostat.
+- Refactored to use DataUpdateCoordinator for better performance.
